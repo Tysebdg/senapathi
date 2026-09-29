@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CA Dashboard | Senapathi & Associates</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- Login Modal / Screen -->
+    <div id="login-screen" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-200">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-emerald-600 text-white rounded-2xl mx-auto flex items-center justify-center text-2xl font-black mb-4 shadow-lg shadow-emerald-600/30">
+                    CA
+                </div>
+                <h2 class="text-2xl font-extrabold text-slate-900">CA Portal Login</h2>
+                <p class="text-xs text-slate-500 mt-1">Enter your secure PIN to access client inquiries</p>
+            </div>
+
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Secure PIN (Default: 1234)</label>
+                    <input type="password" id="pin-input" required maxlength="6" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-center text-2xl tracking-widest text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white transition" placeholder="••••">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-emerald-600/30 transition text-sm flex items-center justify-center gap-2">
+                    <span>Login to Dashboard</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+                <p id="login-error" class="hidden text-red-500 text-xs font-semibold text-center mt-2">Invalid PIN. Please try again (Default PIN: 1234).</p>
+            </form>
+
+            <div class="mt-6 text-center">
+                <a href="index.html" class="text-xs text-slate-500 hover:text-emerald-600 font-semibold transition flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Website
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Content (Hidden until logged in) -->
+    <div id="dashboard-content" class="hidden flex-1 flex flex-col">
+        <!-- Top Navigation -->
+        <header class="bg-slate-900 text-white shadow-md">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-black text-xl">
+                        CA
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-base sm:text-lg tracking-tight">CA Senapathi & Associates</h1>
+                        <p class="text-xs text-emerald-400 font-medium">Client Inquiry Dashboard</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <a href="index.html" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2">
+                        <i class="fa-solid fa-globe"></i> View Website
+                    </a>
+                    <button onclick="logout()" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2 border border-red-500/30">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Body -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full">
+            <!-- Stats Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 font-semibold uppercase">Total Inquiries</p>
+                        <h3 id="total-count" class="text-2xl font-extrabold text-slate-900">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 font-semibold uppercase">Primary Line</p>
+                        <h3 class="text-lg font-bold text-slate-900">+91 7702552900</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-700 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 font-semibold uppercase">Official Email</p>
+                        <h3 class="text-xs font-bold text-slate-900">senapathiandassociates.ca@gmail.com</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inquiries Table Card -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 sm:p-8 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Recent Client Inquiries</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Real-time submissions from your website consultation form</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="loadInquiries()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2">
+                            <i class="fa-solid fa-rotate"></i> Refresh
+                        </button>
+                        <button onclick="clearInquiries()" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2">
+                            <i class="fa-solid fa-trash"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 uppercase text-xs font-bold border-b border-slate-200">
+                                <th class="py-4 px-6">Date / Time</th>
+                                <th class="py-4 px-6">Client Name</th>
+                                <th class="py-4 px-6">Phone Number</th>
+                                <th class="py-4 px-6">Email</th>
+                                <th class="py-4 px-6">Service Required</th>
+                                <th class="py-4 px-6">Message</th>
+                                <th class="py-4 px-6 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inquiries-table-body" class="divide-y divide-slate-100 text-sm">
+                            <!-- Populated dynamically via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="hidden py-16 text-center">
+                    <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto text-2xl mb-4">
+                        <i class="fa-solid fa-inbox"></i>
+                    </div>
+                    <h4 class="text-lg font-bold text-slate-700">No inquiries yet</h4>
+                    <p class="text-xs text-slate-500 mt-1">When clients submit the form on your website, their details will appear here instantly.</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500">
+            <p>&copy; 2025 CA Senapathi & Associates. Secure CA Management Portal.</p>
+        </footer>
+    </div>
+
+    <!-- JavaScript for Dashboard Logic -->
+    <script>
+        // Check if already logged in during this session
+        if (sessionStorage.getItem('ca_logged_in') === 'true') {
+            showDashboard();
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const pin = document.getElementById('pin-input').value;
+            const errorText = document.getElementById('login-error');
+
+            // Default PIN is 1234 (You can change this anytime)
+            if (pin === '1234') {
+                sessionStorage.setItem('ca_logged_in', 'true');
+                showDashboard();
+            } else {
+                errorText.classList.remove('hidden');
+                document.getElementById('pin-input').value = '';
+            }
+        }
+
+        function showDashboard() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('dashboard-content').classList.remove('hidden');
+            loadInquiries();
+        }
+
+        function logout() {
+            sessionStorage.removeItem('ca_logged_in');
+            location.reload();
+        }
+
+        function loadInquiries() {
+            const tbody = document.getElementById('inquiries-table-body');
+            const emptyState = document.getElementById('empty-state');
+            const totalCount = document.getElementById('total-count');
+
+            let inquiries = [];
+            try {
+                inquiries = JSON.parse(localStorage.getItem('ca_inquiries')) || [];
+            } catch (e) {
+                inquiries = [];
+            }
+
+            totalCount.textContent = inquiries.length;
+            tbody.innerHTML = '';
+
+            if (inquiries.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            // Sort newest first
+            inquiries.reverse().forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+                tr.innerHTML = `
+                    <td class="py-4 px-6 text-xs text-slate-500 whitespace-nowrap">${item.timestamp || 'N/A'}</td>
+                    <td class="py-4 px-6 font-bold text-slate-900">${escapeHtml(item.name)}</td>
+                    <td class="py-4 px-6 font-semibold text-emerald-600 whitespace-nowrap">
+                        <a href="tel:${escapeHtml(item.phone)}" class="hover:underline"><i class="fa-solid fa-phone text-xs mr-1"></i> ${escapeHtml(item.phone)}</a>
+                    </td>
+                    <td class="py-4 px-6 text-slate-600 text-xs">${escapeHtml(item.email || 'N/A')}</td>
+                    <td class="py-4 px-6"><span class="bg-emerald-50 text-emerald-700 font-semibold text-xs px-2.5 py-1 rounded-full">${escapeHtml(item.service)}</span></td>
+                    <td class="py-4 px-6 text-slate-600 text-xs max-w-xs truncate" title="${escapeHtml(item.message)}">${escapeHtml(item.message || 'No message')}</td>
+                    <td class="py-4 px-6 text-center whitespace-nowrap">
+                        <a href="https://wa.me/91${item.phone.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(item.name)},%20regarding%20your%20inquiry%20for%20${encodeURIComponent(item.service)}..." target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold shadow-sm inline-flex items-center gap-1 transition">
+                            <i class="fa-brands fa-whatsapp"></i> Reply
+                        </a>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function clearInquiries() {
+            if (confirm('Are you sure you want to clear all inquiries?')) {
+                localStorage.removeItem('ca_inquiries');
+                loadInquiries();
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
